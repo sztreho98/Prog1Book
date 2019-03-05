@@ -11,6 +11,7 @@
             Írj olyan C végtelen ciklusokat, amelyek 0 illetve 100 százalékban dolgoztatnak egy magot és egy olyat, amely  
             100 százalékban minden magot!
         </para>
+		
         <para>
             Megoldás videó:
         </para>
@@ -18,8 +19,68 @@
             Megoldás forrása:                
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+	A programok alapvető részét képzik a ciklusok, amelyek, ha helytelenül vannak megírva, végtelen ciklusokat idézhetnek elő. Ilyenkor a program addig fut, amíg nem teljesíti a feltételeket. Ám ez 		soha nem fog bekövetkezni, mivel az utasítás nem végrehajtható. A végtelen ciklus csak manuálisan állítható le. Több féle végtelen ciklus létezik. Ezekből kerül most bemutatásra 3 darab, egyszerű 		példák kíséretében
+	Az első az, amikor a ciklus csak 1 processzor magot terhel le.
+	<programlisting language="c">
+		<![CDATA[
+		#include <unistd.h>
+		int i = 1;
+		int main()
+		{
+
+		while(i<10)
+
+		return 0;
+		}
+		]]>
+	</programlisting>
+	A fenti példa az egyik legegyszerűbb végtelen ciklust mutatja be. Ennek futtatásakor 1 processzormag csak ezzel a folyamattal foglalkozik és próbálja végrehajtani.
+	
+	A második fajta végtelen ciklus amikor az egész processzort 100%-osan leterheli az adott folyamat.
+	</para>
+	<para>
+	<programlisting language="c">
+		<![CDATA[
+		#include <stdio.h>
+		#include <omp.h>
+
+		int i = 1;
+		int main()
+		{
+		#pragma omp parallel
+		{
+		while(i<10){
+		}
+		 
+		}
+		return 0;
+		}
+		]]>
+	</programlisting>
+	Ekkor 100% dolgozik az összes mag és az összes szál. A rendszer más programok/folyamatok futtatására szinte alkalmatlan. 
+	Fontos megjegyezni, hogy a program működéséhez nem elég simán lefordítani a gcc -o programnév forrás.c paranccsal, hanem mögé kell írni a "-fopenmp" kapcsolót is a program 		sikeres futtatásához.
+	
+	</para>
+	<para>
+	A harmadik fajtája amikor a program várakozik és semennyire sem terheli a processzort.
+	<programlisting language="c">
+		<![CDATA[
+		#include <unistd.h>
+		int i = 1;
+		int main()
+		{
+
+		while(i<10)
+			sleep(1);
+
+		return 0;
+		}
+
+		]]>
+	</programlisting>
+	A várakozás státusz eléréséhez a sleep parancsot kell használni. Ekkor a program 0%-ban terheli a processzort.
+	A végtelen ciklusok (elméletben) sosem állnak meg és futási hibát eredményezhetnek.
+	</para>
     </section>        
         
     <section>
@@ -51,6 +112,9 @@
 	}
 }]]></programlisting>            
         <para>
+	HA van végtelen ciklus igaz lesz, ha nincs akkor hamis.
+	</para>
+	<para>
             A program futtatása, például akár az előző <filename>v.c</filename> ilyen pszeudókódjára:
             <screen><![CDATA[T100(t.c.pseudo)
 true]]></screen>            
@@ -87,9 +151,10 @@ false]]></screen>
 		Lefagy2(Q)
 	}
 
-}]]></programlisting>            
+}]]></programlisting>
+	<para>           
         <programlisting><![CDATA[]]></programlisting>            
-        <para>
+        
             Mit for kiírni erre a <computeroutput>T1000(T1000)</computeroutput> futtatásra?
                                 
             <itemizedlist>
@@ -104,7 +169,10 @@ false]]></screen>
             függvényt, azaz a T100 program nem is létezik.                
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+        Vegyük úgy, hogy létezik a T100-as program. Ez meg tudja mondani egy másik programról, hogy van e benne végtelen ciklus. Ha úgy "látja", hogy nincs, akkor igent kapunk eredménynek. Amennyiben 	talál végtelen ciklust, akkor nemet fogunk kapni.
+	A T1000-res program, ha a T100-as igent ad (nincs végtelen ciklus), akkor végtelen ciklusba kerül. Ha a T100-as nemet ad vissza, akkor megáll.
+	Ha a T1000 megkapja a T1000-ret bemenetnek, akkor: T1000 megáll -> végtelen ciklus -> nem áll meg -> nemet kapunk -> megáll
+	Ebből látszik, hogy nem működhet se a T100-as, se a T1000-res.
         </para>
     </section>        
                 
@@ -121,8 +189,30 @@ false]]></screen>
             Megoldás forrása:  
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
+	Két változót legkönyebben egy  segédváltozó bevezetésével lehet felcserélni, de enélkül is megoldható.
+	Két változó értékét könnyen fel lehet cserélni egy egyszerű program segítségével, ami a következő:
+	<programlisting language="c">
+		<![CDATA[
+           	#include <stdlib.h>
+		#include <string>
+		#include <iostream>
+
+		using namespace std;
+		int main()
+		{
+			int a = 8;
+			int b = 1;
+
+			a = a + b;
+			b = a - b;
+			a = a - b;
+
+			cout << a << " " << b << endl;
+		}
+		]]>
+	</programlisting>
+	Ez tulajdonképpen nem is programozás csak egyszerű matematika.
+	</para>
     </section>                     
 
     <section>
@@ -139,7 +229,103 @@ false]]></screen>
             Megoldás forrása:  
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+	Labdapattogtatást két féleképpen is lehet írni. If-ek használatával, ami lényegesen egyszerűbb, illetve if-ek és minden egyéb logikai utasítás nélkül, ami egy nehezebb változat.
+	Először nézzük az if-es változatot.
+        <programlisting language="c">
+	<![CDATA[
+        #include <stdio.h>
+	#include <curses.h>
+	#include <unistd.h>
+
+	int
+	main ( void )
+	{
+		WINDOW *wind;
+		wind = initscr ();
+		
+		int x = 1;
+		int y = 1;
+		int xmove = 1;
+		int ymove = 1;
+		int mx;
+		int my;
+
+		for ( ;; ) {
+
+			getmaxyx (wind, my, mx );
+			
+				for (int i = 0; i < my; ++i)mvprintw ( i, mx-1, "|" );
+	       			for (int i = 0; i < mx; ++i)mvprintw ( my-1, i, "=" );  	
+				for (int i = 0; i < my; ++i)mvprintw ( i, 0, "|" );
+				for (int i = 0; i < mx; ++i)mvprintw ( 0, i, "=" );
+				
+			mvprintw (y, x, "§" );
+
+			refresh();
+			usleep (50000);
+
+			clear();
+
+			x = x + xmove;
+			y = y + ymove;
+
+			if (x>=mx-1) {
+				xmove = xmove * -1;
+			}
+			if (x<=1) {
+				xmove = xmove * -1;
+			}
+			if ( y<=1 ) {
+		 	   	ymove = ymove * -1;
+			}
+			if ( y>=my-2 ) {
+		    		ymove = ymove * -1;
+			}
+
+	    }
+
+	    return 0;
+	}
+	]]>
+	</programlisting>
+	A program elején beállítottuk, hogy a program pattogtatásra kijelölt területe akkora legyen, mint amekkora az ablak mérete. Ezután beállítottuk az indulási helyet és az elmozdulást az x és y 		tengelyen. Ezután beállítottuk a "labda" sebességét, illetve, hogy milyen karakter legyen a "labda". Az if-ek arra szolgálnak, hogyha a labda elérte az ablak szélét, akkor megváltozzon az 		iránya(*-1).
+	A 4 egymás utáni for ciklus csak kiegészítésként szerepel, keret gyanánt.
+        </para>
+	<para>
+	A második verzió, if-ek elhagyásával.
+        <programlisting language="c">
+	<![CDATA[
+        #include <curses.h> 
+   	#include <unistd.h> 
+    	#include <stdlib.h> 
+    	int main ( void )
+    	{
+        	WINDOW *ablak;   	
+        	ablak = initscr (); 
+        	int mx;  	
+        	int my;
+        	int xj = 0, xk = 0, yj = 0, yk = 0; 
+        	for ( ;; ) {
+        	    getmaxyx ( ablak, my , mx ); 
+                        
+        
+            	xj = (xj - 1) % mx;
+            	xk = (xk + 1) % mx;
+            	yj = (yj - 1) % my;
+            	yk = (yk + 1) % my;						
+				         		
+            
+            	mvprintw ( abs (yj + (my - yk) ), abs (xj + (mx - xk)) , "O" ); 	
+            	refresh ();		
+            	usleep ( 80000 );	
+	    	clear();	
+        	}
+        	return 0;
+	}
+	]]>
+	</programlisting>
+	Logikai utasítások nélkül más oldalról kell megközelítenünk a dolgot. Kijelölünk egy maxmimum értéket és maradékos osztást végzünk. Például, ha 1-től 100-ig nézzük, akkor kezdjük az eggyel. 1/100 		= 0 és maradt az 1. Ezt folytatjuk 100-ig, de ha elérjük a 100-at akkor a maradék 0 lesz, ami nekünk nem jó. Ezért két ilyen sorozatra van szükségünk. Az egyik növekszik a másik csökken.
+	Az abs(n)-függvény miatt szükségünk lesz egy plusz header fájlra, ami nem más, mint az stdlib.h
         </para>
     </section>                     
 
@@ -156,7 +342,27 @@ false]]></screen>
             Megoldás forrása: <link xlink:href=""></link>
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat... 
+        Azt az adatmennyiséget, amivel a processzor egszerre dolgozni képes, szóhossznak vagy bitszámnak hívunk. A nagyobb szám nagyobb sebességet eredményez. Napjainkban 32 vagy 64 bitesek a rendszerek.
+	A BogoMIPS az egyik legismertebb processzorsebesség mérő program, amit Linus Torvalds írt meg a MIPS alapján.
+	A feladat a szóhossz ellenőrzése a számítógépünkön. A legkönnyebb módszer a bitshiftelés, ami annyiból áll, hogy vannnak nulláink és a végén egy 1-es. És elkezdünk balra shiftelni, ami a 		következőképpen néz ki: 000001 -> 000010 -> 000100 -> 001000 -> 010000 -> 100000
+	Ezt kinullázódásig ismételjük.
+	A program a következő:
+ 	<programlisting language="c">
+	<![CDATA[
+	 #include <stdio.h>
+    	 int main(void)
+    	 {
+	   	 int bitszam = 0;
+	   	 int a=1;
+	  	 do
+	  	 ++bitszam;
+	    	 while(a<<=1);
+	    	 printf("A szóhossz a gépen: %d bites\n", bitszam);
+	 return 0;
+    	 }    
+	]]>
+	</programlisting>
+	Ha "int"-et használunk, akkor előfordulhat, hogy a 64 bites rendszeren is 32 bitet fog kiírni a program.
         </para>
     </section>                     
 
@@ -173,7 +379,63 @@ false]]></screen>
             Megoldás forrása: <link xlink:href=""></link>
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+        Ezt az algoritmust két fiatal találta ki, akik nem mások, mint a Google alapítói. Tualjdonképpen ez az algoritmus forradalmasította az internetes keresést, aminek a google a népszerűségét 		köszönheti.
+	Íme a forráskód:
+	<programlisting language="c">
+    	<![CDATA[
+	#include <stdio.h>
+	#include <math.h>
+	void
+	kiir (double tomb[], int db)
+	{
+	  for (int i = 0; i < db; ++i)
+	    printf ("%f\n", tomb[i]);
+	}
+	double
+	tavolsag (double PR[], double PRv[], int n)
+	{
+	  double osszeg = 0.0;
+	  for (int i = 0; i < n; ++i)
+	    osszeg += (PRv[i] - PR[i]) * (PRv[i] - PR[i]);
+	  return sqrt(osszeg);
+	}
+	int
+	main (void)
+	{
+	  double L[4][4] = {
+	    {0.0, 0.0, 1.0 / 3.0, 0.0},
+	    {1.0, 1.0 / 2.0, 1.0 / 3.0, 1.0},
+	    {0.0, 1.0 / 2.0, 0.0, 0.0},
+	    {0.0, 0.0, 1.0 / 3.0, 0.0}
+	  };
+	  double PR[4] = { 0.0, 0.0, 0.0, 0.0 };
+	  double PRv[4] = { 1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0 };
+	  int i, j;
+	  for (;;)
+	    {
+	      for (i = 0; i < 4; ++i)
+		{
+		  PR[i] = 0.0;
+		  for (j = 0; j < 4; ++j)
+		    PR[i] += (L[i][j] * PRv[j]);
+		}
+	      if (tavolsag (PR, PRv, 4) < 0.00000001)
+		break;
+	      for (i = 0; i < 4; ++i)
+		PRv[i] = PR[i];
+	    }
+	  kiir (PR, 4);
+	  return 0;
+	}
+    	]]>
+        </programlisting>
+	De mit is csinál pontosan?
+	Lényegében itt is egy végtelen ciklus fut, mint az első feladatban, annyi különbséggel, hogy itt van egy feltétel. Ha a távolság kisebb, mint 0.00000001, akkor a program kilép a ciklusból 		(<programlisting language="c">
+    	<![CDATA["if (tavolsag (PR, PRv, 4) < 0.00000001)
+		   break;") ]]>
+        </programlisting>)
+	Mátrixokra is szükség van a mutatások kezeléséhez. Egy 4x4-es mátrix sorai és oszlopai jelképezik, hogy ki kire mutat. Ha az első oszlop első sorában van egy 1-es, az azt jelenti, hogy az első sor 		eleme mutat az első oszlop elemére.
+	Ha program futtatásakor használni kell a -lm kapcsolót. Az eredmény amit fogunk kapni az négy szám lesz, ami nem más, mint a négy PageRank érték.
         </para>
     </section>
 
@@ -188,6 +450,31 @@ false]]></screen>
         <para>
             Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R">https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R</link>
         </para>
+	<para>
+	Brun tétele, miszerint az ikerprímek reciprokösszege egy Brun-konstans néven ismert véges értékhez konvergál. (Wikipédia)
+	Ikerprím: Prímpár, mely különbsége 2 (3 és 5 vagy 5 és 7)
+	Tehát ha az ikerprímek reciprokait összeadjuk (3, 5, 7 -> 1/3 + 1/5 + 1/7), akkor ezek egy véges értékhez fognak közelíteni.
+	A szimuláció ezt mutatja be.
+	<programlisting language="R">
+    	<![CDATA[
+	stp <- function(x){
+
+	    primes = primes(x)
+	    diff = primes[2:length(primes)]-primes[1:length(primes)-1]
+	    idx = which(diff==2)
+	    t1primes = primes[idx]
+	    t2primes = primes[idx]+2
+	    rt1plust2 = 1/t1primes+1/t2primes
+	    return(sum(rt1plust2))
+	}
+
+	x=seq(10, 1000000, by=10000)
+	y=sapply(x, FUN = stp)
+	plot(x,y,type="b")
+	]]>
+	</programlisting>
+	A program az első soraaiban megkresi az ikerprímeket (első 7 sor). Ezután a reciprokukat veszi (8. sor), majd a plot paranccsal egy grafikonra kirajzolja őket. Ezen reciprokok összege sose fogja 		elérni a Brun-konstanst, csupán közelíteni fogja azt.
+	</para>
     </section>
     
     <section xml:id="bhax-textbook-feladatok-turing.MontyHall">
@@ -202,7 +489,71 @@ false]]></screen>
             Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/MontyHall_R">https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/MontyHall_R</link>
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+	<programlisting language="c">
+    	<![CDATA[
+		#   An illustration written in R for the Monty Hall Problem 
+		#   Copyright (C) 2019  Dr. Norbert Bátfai, nbatfai@gmail.com
+		#
+		#   This program is free software: you can redistribute it and/or modify
+		#   it under the terms of the GNU General Public License as published by
+		#   the Free Software Foundation, either version 3 of the License, or
+		#   (at your option) any later version.
+		#
+		#   This program is distributed in the hope that it will be useful,
+		#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+		#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		#   GNU General Public License for more details.
+		#
+		#   You should have received a copy of the GNU General Public License
+		#   along with this program.  If not, see <http://www.gnu.org/licenses/>
+		#
+		#   https://bhaxor.blog.hu/2019/01/03/erdos_pal_mit_keresett_a_nagykonyvben_a_monty_hall-paradoxon_kapcsan
+		# 
+
+		kiserletek_szama=10000000
+		kiserlet = sample(1:3, kiserletek_szama, replace=T)
+		jatekos = sample(1:3, kiserletek_szama, replace=T)
+		musorvezeto=vector(length = kiserletek_szama)
+
+		for (i in 1:kiserletek_szama) {
+
+		    if(kiserlet[i]==jatekos[i]){
+		    
+			mibol=setdiff(c(1,2,3), kiserlet[i])
+		    
+		    }else{
+		    
+			mibol=setdiff(c(1,2,3), c(kiserlet[i], jatekos[i]))
+		    
+		    }
+
+		    musorvezeto[i] = mibol[sample(1:length(mibol),1)]
+
+		}
+
+		nemvaltoztatesnyer= which(kiserlet==jatekos)
+		valtoztat=vector(length = kiserletek_szama)
+
+		for (i in 1:kiserletek_szama) {
+
+		    holvalt = setdiff(c(1,2,3), c(musorvezeto[i], jatekos[i]))
+		    valtoztat[i] = holvalt[sample(1:length(holvalt),1)]
+		    
+		}
+
+		valtoztatesnyer = which(kiserlet==valtoztat)
+
+
+		sprintf("Kiserletek szama: %i", kiserletek_szama)
+		length(nemvaltoztatesnyer)
+		length(valtoztatesnyer)
+		length(nemvaltoztatesnyer)/length(valtoztatesnyer)
+		length(nemvaltoztatesnyer)+length(valtoztatesnyer)
+	]]>
+        </programlisting>
+	A probléma egyszerűen leírva. Ha választhatunk 3 ajtó közül, melyek közül 1 mögött nyeremény van a másik 2 mögött semmi, akkor 33.333%, az esélye, hogy eltaláljuk és 66.666%, hogy nem (a végtelen 		tizedes törtek miat kerekítve meg is kapjuk a 100%-ot). Az áltlunk nem választott 2 ajtó közül az egyiket kinyitják, ami mögött nincs semmi. Ekkor kapjuk a kérdést, hogy akarunk e változtatni a 		döntésünkön. Sokan azt gondolják, hogy 50-50% már az esély, így nem változtatnak. De ez nem így van. Ha változtatunk, akkor 66.666% esélyünk van a jó válaszra, mivel az első választásunkkor 		33.333% volt az esély és attól, hogy kinyílt egy nem választott ajtó, attól ez nem lett több arra az ajtóra. A másik 2 ajtó ugynaúgy 66.666%-os eséllyel játszik tovább, csak az egyiket már 		ismerjük, hogy nincs mögötte semmi. Ezért van nagyobb győzelmi esélyünk, ha változtatunk. 
+	A szimuláció ugynaezt játsza le az általunk beállított alkalomszor. Ha változtatunk, akkor az esetek 2/3-ában nyerünk, ám ha nem változtatunk, akkor csak az 1/3-ában.
+	A Las Vegas ostroma című filmben is elmagyarázzák és levezetik ezt a pradoxont.
         </para>
     </section>
 
